@@ -16,6 +16,13 @@ gateways = {
 	'10.10.0.4': 333,
 }
 
+# List with static routes
+# will be added when start service, and will remove when stoping
+static_routes = {
+	'1.1.1.1/32': 'default',
+	'192.168.0.0/23': '10.10.0.3'
+}
+
 # List bypass destination ips, for allow this traffic from default gateway
 # this addresses don't be sniffed and adding in routing table
 bypass_list = [

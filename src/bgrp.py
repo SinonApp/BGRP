@@ -23,6 +23,19 @@ checked = {
 
 }
 
+def add_static_route(network, gateway, mark):
+	try:
+		subprocess.check_output(f"ip route del {network} via {gateway} table {mark}".split(), stderr=subprocess.DEVNULL)
+		subprocess.check_output(f"ip route add {network} via {gateway} table {mark}".split(), stderr=subprocess.DEVNULL)
+	except:
+		pass
+
+def del_static_route(network, gateway, mark):
+	try:
+		subprocess.check_output(f"ip route del {network} via {gateway} table {mark}".split(), stderr=subprocess.DEVNULL)
+	except:
+		pass
+
 def add_gateway_checking_mark(gateway, mark):
 	try:
 		subprocess.check_output(f"ip rule add fwmark {mark} lookup {mark}".split(), stderr=subprocess.DEVNULL)
@@ -93,6 +106,10 @@ def detect_forwarding_ips():
 		del_gateway_checking_mark(gateway, config.gateways[gateway])
 		add_gateway_checking_mark(gateway, config.gateways[gateway])
 
+	print("[!][BGRP] Adding static routes")
+	for static in config.static_routes:
+		add_static_route(static, config.static_routes[static], config.route_table)
+
 	try:
 		process = subprocess.Popen(['tcpdump', '-i', config.listen_interface, '-Q', config.listen_direction, '-nn'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 		print("[*][BGRP] Detecting forwarding IPs...")
@@ -143,6 +160,10 @@ def detect_forwarding_ips():
 			break
 		except Exception as e:
 			print(f"[X][BGRP] Unknown error: {str(e)}")
+
+	print("[!][BGRP] Clearing static routes")
+	for static in config.static_routes:
+		del_static_route(static, config.static_routes[static], config.route_table)
 
 	print("[!][BGRP] Clearing tables gateways")
 	for gateway in config.gateways:
