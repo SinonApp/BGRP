@@ -52,6 +52,8 @@ Congratulations! You have successfully installed BGRP on your gateway device.
 
 # Configuring
 ```
+nano /etc/bgrp/config.py
+
 listen_interface = 'ens3'
 listen_direction = 'out' # in, out, inout
 
