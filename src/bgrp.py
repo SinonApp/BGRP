@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser(description='Best Gateway Routing Protocol')
 parser.add_argument('--config', help='path to config.py')
 
 args = parser.parse_args()
-if agrs.config:
+if args.config:
 	import importlib.util
 	spec = importlib.util.spec_from_file_location("config", args.config)
 	config = importlib.util.module_from_spec(spec)
