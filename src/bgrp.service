@@ -1,0 +1,11 @@
+[Unit]
+Description=Best Gateway Routing Protocol
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/python3 /usr/bin/bgrp.py --config /etc/bgrp/config.py
+
+[Install]
+WantedBy=multi-user.target

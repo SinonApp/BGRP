@@ -1,7 +1,23 @@
+#!/usr/bin/env python3
+
 import subprocess
 import concurrent.futures
 import time
-from config import *
+import argparse
+import sys
+
+parser = argparse.ArgumentParser(description='Best Gateway Routing Protocol')
+parser.add_argument('--config', help='path to config.py')
+
+args = parser.parse_args()
+if agrs.config:
+	import importlib.util
+	spec = importlib.util.spec_from_file_location("config", args.config)
+	config = importlib.util.module_from_spec(spec)
+	sys.modules["config"] = config
+	spec.loader.exec_module(config)
+else:
+	sys.exit()
 
 checked = {
 
@@ -73,12 +89,12 @@ def del_route(target_ip):
 
 def detect_forwarding_ips():
 	print("[!][BGRP] Adding tables gateways")
-	for gateway in gateways:
-		del_gateway_checking_mark(gateway, gateways[gateway])
-		add_gateway_checking_mark(gateway, gateways[gateway])
+	for gateway in config.gateways:
+		del_gateway_checking_mark(gateway, config.gateways[gateway])
+		add_gateway_checking_mark(gateway, config.gateways[gateway])
 
 	try:
-		process = subprocess.Popen(['tcpdump', '-i', listen_interface, '-Q', listen_direction, '-nn'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+		process = subprocess.Popen(['tcpdump', '-i', config.listen_interface, '-Q', config.listen_direction, '-nn'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 		print("[*][BGRP] Detecting forwarding IPs...")
 	except Exception as e:
 		print(f"[X][BGRP] Error sniffing traffic: {str(e)}")
@@ -100,11 +116,11 @@ def detect_forwarding_ips():
 
 				target_ip = target_ip.replace(':', '')
 				if check_target_in_checked(target_ip): continue
-				if target_ip in bypass_list: continue
+				if target_ip in config.bypass_list: continue
 
 				avg_ping_times = {}
 				with concurrent.futures.ThreadPoolExecutor() as executor:
-					ping_tasks = {executor.submit(average_ping_time, target_ip, gateways[gateway]): gateway for gateway in gateways}
+					ping_tasks = {executor.submit(average_ping_time, target_ip, config.gateways[gateway]): gateway for gateway in config.gateways}
 					for task in concurrent.futures.as_completed(ping_tasks):
 						gateway = ping_tasks[task]
 						try:
@@ -129,8 +145,8 @@ def detect_forwarding_ips():
 			print(f"[X][BGRP] Unknown error: {str(e)}")
 
 	print("[!][BGRP] Clearing tables gateways")
-	for gateway in gateways:
-		del_gateway_checking_mark(gateway, gateways[gateway])
-		add_gateway_checking_mark(gateway, gateways[gateway])
+	for gateway in config.gateways:
+		del_gateway_checking_mark(gateway, config.gateways[gateway])
+		add_gateway_checking_mark(gateway, config.gateways[gateway])
 
 detect_forwarding_ips()
