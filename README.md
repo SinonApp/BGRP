@@ -33,7 +33,7 @@ To install BGRP, please follow these steps:
 Download the latest version of BGRP from the official website or the designated repository.
 
 ```
-git clone git@github.com:SinonApp/BGRP.git && cd ./BGRP
+git clone https://github.com/SinonApp/BGRP.git && cd ./BGRP
 ```
 
 Run the installation script included with the package. Make sure to follow the provided instructions and prompts.
